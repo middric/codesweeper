@@ -82,11 +82,7 @@ func main() {
 	// Set up waves
 	for j := 0; j < height; j++ {
 		for i := 0; i < width; i++ {
-			grid[i][j] = Cell{
-				proximity: 0,
-				isMine:    false,
-				entity:    termloop.NewText(i, j, sSpace, termloop.ColorWhite, termloop.ColorCyan),
-			}
+			grid[i][j] = NewCell(i, j)
 			level.AddEntity(&grid[i][j])
 		}
 	}
