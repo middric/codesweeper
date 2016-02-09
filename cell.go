@@ -6,6 +6,7 @@ import (
 	"github.com/JoelOtter/termloop"
 )
 
+// Cell defines the properties for a cell in the minefield
 type Cell struct {
 	entity    *termloop.Text
 	isFlagged bool
@@ -15,6 +16,8 @@ type Cell struct {
 	render    bool
 }
 
+// NewCell creates a new cell. Accepts x and y coordinate parameters to
+// determine "isWave" state. Returns a new instance of Cell.
 func NewCell(x int, y int) Cell {
 	cell := Cell{
 		entity:    termloop.NewText(x, y, " ", termloop.ColorWhite, termloop.ColorCyan),
@@ -28,6 +31,7 @@ func NewCell(x int, y int) Cell {
 	return cell
 }
 
+// Draw a cell
 func (cell *Cell) Draw(screen *termloop.Screen) {
 	if cell.render {
 		if cell.isMine {
@@ -46,6 +50,7 @@ func (cell *Cell) Draw(screen *termloop.Screen) {
 	cell.entity.Draw(screen)
 }
 
+// Tick handles Cell inputs
 func (cell *Cell) Tick(event termloop.Event) {}
 
 func (cell *Cell) drawRevealed() {
