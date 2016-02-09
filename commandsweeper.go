@@ -18,7 +18,6 @@ const sMine = "✱"
 const sWave = "~"
 const sBubble = "·"
 const sSpace = " "
-const sPlayer = '⛴'
 
 var game *termloop.Game
 var level *termloop.BaseLevel
@@ -109,11 +108,7 @@ func main() {
 	game.SetDebugOn(true)
 	game.Screen().AddEntity(termloop.NewText(0, 0, " MineSweeper ", termloop.ColorBlue, termloop.ColorBlack))
 
-	// Set up player
-	player = Player{
-		entity: termloop.NewEntity(width/2, height/2, 1, 1),
-	}
-	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: sPlayer})
+	player = NewPlayer()
 
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
 	grid = make([][]cell, width)

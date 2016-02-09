@@ -12,6 +12,15 @@ type Player struct {
 	state  int
 }
 
+func NewPlayer() Player {
+	player = Player{
+		entity: termloop.NewEntity(width/2, height/2, 1, 1),
+	}
+	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: '⛴'})
+
+	return player
+}
+
 // Draw func
 func (player *Player) Draw(screen *termloop.Screen) {
 	if player.state != GameOver {
