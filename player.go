@@ -4,7 +4,7 @@ import "github.com/JoelOtter/termloop"
 
 //  Player state
 const (
-	GameOver = 1 << iota
+	Dead = 1 << iota
 )
 
 type Player struct {
@@ -23,7 +23,7 @@ func NewPlayer() Player {
 
 // Draw func
 func (player *Player) Draw(screen *termloop.Screen) {
-	if player.state != GameOver {
+	if player.state != Dead {
 		// Keep player in bounds
 		x, y := player.entity.Position()
 		if x < 0 {
@@ -51,7 +51,7 @@ func (player *Player) Draw(screen *termloop.Screen) {
 // Tick func
 func (player *Player) Tick(event termloop.Event) {
 	x, y := player.entity.Position()
-	if event.Ch == 102 && player.state != GameOver && !grid[x][y].render {
+	if event.Ch == 102 && player.state != Dead && !grid[x][y].render {
 		if grid[x][y].isFlagged {
 			grid[x][y].isFlagged = false
 			flags--
@@ -59,7 +59,7 @@ func (player *Player) Tick(event termloop.Event) {
 			grid[x][y].isFlagged = true
 			flags++
 		}
-		updateUI()
+		UpdateUI()
 	} else if event.Type == termloop.EventKey {
 		x, y := player.entity.Position()
 		switch event.Key {
@@ -77,10 +77,11 @@ func (player *Player) Tick(event termloop.Event) {
 			break
 		case termloop.KeySpace:
 			if grid[x][y].isMine {
-				gameOver(player)
+				ShowGameOver()
+				player.state = Dead
 			}
 			revealCells(x, y)
-			updateUI()
+			UpdateUI()
 		}
 	}
 }

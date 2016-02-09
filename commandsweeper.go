@@ -19,27 +19,6 @@ var grid [][]Cell
 var player Player
 var flags int
 
-func updateUI() {
-	_, screenH := game.Screen().Size()
-	game.Screen().AddEntity(termloop.NewText(0, screenH-1, " Mines: "+strconv.Itoa(mineCount)+", Flags: "+strconv.Itoa(flags), termloop.ColorBlue, termloop.ColorBlack))
-}
-
-func gameOver(player *Player) {
-	msg := []string{
-		"                     ",
-		"      Game Over!     ",
-		"                     ",
-	}
-	length := len(msg[0])
-	left := (width / 2) - (length / 2)
-	top := (height / 2) - 2
-
-	for i, line := range msg {
-		level.AddEntity(termloop.NewText(left, top+i, line, termloop.ColorBlack, termloop.ColorRed))
-	}
-	player.state = GameOver
-}
-
 func revealCells(x int, y int) {
 	if x >= 0 && y >= 0 && x < width && y < height {
 		if !grid[x][y].render && !grid[x][y].isMine {
@@ -62,12 +41,12 @@ func revealCells(x int, y int) {
 
 func main() {
 	game = termloop.NewGame()
-	game.SetDebugOn(true)
-	game.Screen().AddEntity(termloop.NewText(0, 0, " MineSweeper ", termloop.ColorBlue, termloop.ColorBlack))
-
 	player = NewPlayer()
-
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
+	game.SetDebugOn(true)
+
+	SetupUI()
+
 	grid = make([][]Cell, width)
 	for i := range grid {
 		grid[i] = make([]Cell, height)
@@ -101,7 +80,7 @@ func main() {
 	level.AddEntity(&player)
 	game.Screen().SetLevel(level)
 	game.Start()
-	updateUI()
+	UpdateUI()
 }
 
 func generateProximity(grid [][]Cell) [][]Cell {
