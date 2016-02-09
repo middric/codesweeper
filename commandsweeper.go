@@ -27,18 +27,16 @@ const sPlayer = '⛴'
 
 var game *termloop.Game
 var level *termloop.BaseLevel
-var grid [][]Cell
-var player Player
+var grid [][]cell
+var player boat
 var flags int
 
-// Player struct
-type Player struct {
+type boat struct {
 	entity *termloop.Entity
 	state  int
 }
 
-// Cell struct
-type Cell struct {
+type cell struct {
 	proximity int
 	isMine    bool
 	entity    *termloop.Text
@@ -46,7 +44,7 @@ type Cell struct {
 	isFlagged bool
 }
 
-func (cell *Cell) Draw(screen *termloop.Screen) {
+func (cell *cell) Draw(screen *termloop.Screen) {
 	if cell.render {
 		cell.entity.SetColor(termloop.ColorWhite, termloop.ColorBlue)
 		if cell.isMine {
@@ -73,10 +71,10 @@ func (cell *Cell) Draw(screen *termloop.Screen) {
 	cell.entity.Draw(screen)
 }
 
-func (cell *Cell) Tick(event termloop.Event) {}
+func (cell *cell) Tick(event termloop.Event) {}
 
 // Draw func
-func (player *Player) Draw(screen *termloop.Screen) {
+func (player *boat) Draw(screen *termloop.Screen) {
 	if player.state != GameOver {
 		// Keep player in bounds
 		x, y := player.entity.Position()
@@ -103,7 +101,7 @@ func (player *Player) Draw(screen *termloop.Screen) {
 }
 
 // Tick func
-func (player *Player) Tick(event termloop.Event) {
+func (player *boat) Tick(event termloop.Event) {
 	x, y := player.entity.Position()
 	if event.Ch == 102 && player.state != GameOver && !grid[x][y].render {
 		if grid[x][y].isFlagged {
@@ -144,7 +142,7 @@ func updateUI() {
 	game.Screen().AddEntity(termloop.NewText(screenW-screenW, screenH-1, " Mines: "+strconv.Itoa(mineCount)+", Flags: "+strconv.Itoa(flags), termloop.ColorBlue, termloop.ColorBlack))
 }
 
-func gameOver(player *Player) {
+func gameOver(player *boat) {
 	msg := []string{
 		"                     ",
 		"      Game Over!     ",
@@ -186,21 +184,21 @@ func main() {
 	game.Screen().AddEntity(termloop.NewText(0, 0, " MineSweeper ", termloop.ColorBlue, termloop.ColorBlack))
 
 	// Set up player
-	player = Player{
+	player = boat{
 		entity: termloop.NewEntity(1, 1, 1, 1),
 	}
 	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: sPlayer})
 
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
-	grid = make([][]Cell, width)
+	grid = make([][]cell, width)
 	for i := range grid {
-		grid[i] = make([]Cell, height)
+		grid[i] = make([]cell, height)
 	}
 
 	// Set up waves
 	for j := 0; j < height; j++ {
 		for i := 0; i < width; i++ {
-			grid[i][j] = Cell{
+			grid[i][j] = cell{
 				proximity: 0,
 				isMine:    false,
 				entity:    termloop.NewText(i, j, sSpace, termloop.ColorWhite, termloop.ColorCyan),
@@ -232,7 +230,7 @@ func main() {
 	updateUI()
 }
 
-func generateProximity(grid [][]Cell) [][]Cell {
+func generateProximity(grid [][]cell) [][]cell {
 	for x := range grid {
 		for y := range grid[x] {
 			if grid[x][y].isMine {
@@ -275,7 +273,7 @@ func generateProximity(grid [][]Cell) [][]Cell {
 	return grid
 }
 
-func generateMines(x int, y int, count int) [][]Cell {
+func generateMines(x int, y int, count int) [][]cell {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < count; i++ {
 		placeMine(x, y, grid)
@@ -284,7 +282,7 @@ func generateMines(x int, y int, count int) [][]Cell {
 	return grid
 }
 
-func placeMine(x int, y int, grid [][]Cell) [][]Cell {
+func placeMine(x int, y int, grid [][]cell) [][]cell {
 	randX := rand.Intn(x)
 	randY := rand.Intn(y)
 
