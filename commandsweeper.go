@@ -20,8 +20,8 @@ var player Player
 var flags int
 
 func updateUI() {
-	screenW, screenH := game.Screen().Size()
-	game.Screen().AddEntity(termloop.NewText(screenW-screenW, screenH-1, " Mines: "+strconv.Itoa(mineCount)+", Flags: "+strconv.Itoa(flags), termloop.ColorBlue, termloop.ColorBlack))
+	_, screenH := game.Screen().Size()
+	game.Screen().AddEntity(termloop.NewText(0, screenH-1, " Mines: "+strconv.Itoa(mineCount)+", Flags: "+strconv.Itoa(flags), termloop.ColorBlue, termloop.ColorBlack))
 }
 
 func gameOver(player *Player) {
