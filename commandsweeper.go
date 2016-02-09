@@ -111,7 +111,7 @@ func main() {
 
 	// Set up player
 	player = Player{
-		entity: termloop.NewEntity(1, 1, 1, 1),
+		entity: termloop.NewEntity(width/2, height/2, 1, 1),
 	}
 	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: sPlayer})
 
