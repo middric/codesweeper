@@ -33,14 +33,10 @@ func NewCell(x int, y int) Cell {
 
 // Draw a cell
 func (cell *Cell) Draw(screen *termloop.Screen) {
-	if cell.render {
-		if cell.isMine {
-			cell.drawMine()
-		} else if cell.proximity > 0 {
-			cell.drawProximity()
-		} else {
-			cell.drawRevealed()
-		}
+	if cell.render && cell.isMine {
+		cell.drawMine()
+	} else if cell.render {
+		cell.drawRevealed()
 	} else if cell.isFlagged {
 		cell.drawFlag()
 	} else {
@@ -54,12 +50,16 @@ func (cell *Cell) Draw(screen *termloop.Screen) {
 func (cell *Cell) Tick(event termloop.Event) {}
 
 func (cell *Cell) drawRevealed() {
-	char := " "
-	if cell.isWave {
-		char = "·"
+	if cell.proximity > 0 {
+		cell.drawProximity()
+	} else {
+		char := " "
+		if cell.isWave {
+			char = "·"
+		}
+		cell.entity.SetText(char)
+		cell.entity.SetColor(termloop.ColorWhite, termloop.ColorBlue)
 	}
-	cell.entity.SetText(char)
-	cell.entity.SetColor(termloop.ColorWhite, termloop.ColorBlue)
 }
 
 func (cell *Cell) drawMine() {
