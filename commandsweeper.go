@@ -13,11 +13,6 @@ const width = 50
 const height = 20
 const mineCount = 100
 
-//  Player state
-const (
-	GameOver = 1 << iota
-)
-
 // "Graphics"
 const sMine = "✱"
 const sWave = "~"
@@ -28,13 +23,8 @@ const sPlayer = '⛴'
 var game *termloop.Game
 var level *termloop.BaseLevel
 var grid [][]cell
-var player boat
+var player Player
 var flags int
-
-type boat struct {
-	entity *termloop.Entity
-	state  int
-}
 
 type cell struct {
 	proximity int
@@ -73,76 +63,12 @@ func (cell *cell) Draw(screen *termloop.Screen) {
 
 func (cell *cell) Tick(event termloop.Event) {}
 
-// Draw func
-func (player *boat) Draw(screen *termloop.Screen) {
-	if player.state != GameOver {
-		// Keep player in bounds
-		x, y := player.entity.Position()
-		if x < 0 {
-			x = 0
-		} else if x >= width {
-			x = width - 1
-		}
-
-		if y < 0 {
-			y = 0
-		} else if y >= height {
-			y = height - 1
-		}
-
-		player.entity.SetPosition(x, y)
-
-		// Draw player
-		player.entity.Draw(screen)
-
-		screenWidth, screenHeight := screen.Size()
-		level.SetOffset((screenWidth-width)/2, (screenHeight-height)/2)
-	}
-}
-
-// Tick func
-func (player *boat) Tick(event termloop.Event) {
-	x, y := player.entity.Position()
-	if event.Ch == 102 && player.state != GameOver && !grid[x][y].render {
-		if grid[x][y].isFlagged {
-			grid[x][y].isFlagged = false
-			flags--
-		} else {
-			grid[x][y].isFlagged = true
-			flags++
-		}
-		updateUI()
-	} else if event.Type == termloop.EventKey {
-		x, y := player.entity.Position()
-		switch event.Key {
-		case termloop.KeyArrowRight:
-			player.entity.SetPosition(x+1, y)
-			break
-		case termloop.KeyArrowLeft:
-			player.entity.SetPosition(x-1, y)
-			break
-		case termloop.KeyArrowUp:
-			player.entity.SetPosition(x, y-1)
-			break
-		case termloop.KeyArrowDown:
-			player.entity.SetPosition(x, y+1)
-			break
-		case termloop.KeySpace:
-			if grid[x][y].isMine {
-				gameOver(player)
-			}
-			revealCells(x, y)
-			updateUI()
-		}
-	}
-}
-
 func updateUI() {
 	screenW, screenH := game.Screen().Size()
 	game.Screen().AddEntity(termloop.NewText(screenW-screenW, screenH-1, " Mines: "+strconv.Itoa(mineCount)+", Flags: "+strconv.Itoa(flags), termloop.ColorBlue, termloop.ColorBlack))
 }
 
-func gameOver(player *boat) {
+func gameOver(player *Player) {
 	msg := []string{
 		"                     ",
 		"      Game Over!     ",
@@ -184,7 +110,7 @@ func main() {
 	game.Screen().AddEntity(termloop.NewText(0, 0, " MineSweeper ", termloop.ColorBlue, termloop.ColorBlack))
 
 	// Set up player
-	player = boat{
+	player = Player{
 		entity: termloop.NewEntity(1, 1, 1, 1),
 	}
 	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: sPlayer})
