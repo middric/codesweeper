@@ -21,46 +21,9 @@ const sSpace = " "
 
 var game *termloop.Game
 var level *termloop.BaseLevel
-var grid [][]cell
+var grid [][]Cell
 var player Player
 var flags int
-
-type cell struct {
-	proximity int
-	isMine    bool
-	entity    *termloop.Text
-	render    bool
-	isFlagged bool
-}
-
-func (cell *cell) Draw(screen *termloop.Screen) {
-	if cell.render {
-		cell.entity.SetColor(termloop.ColorWhite, termloop.ColorBlue)
-		if cell.isMine {
-			cell.entity.SetText(sMine)
-			cell.entity.SetColor(termloop.ColorRed, termloop.ColorBlack)
-		} else if cell.proximity > 0 {
-			cell.entity.SetText(strconv.Itoa(cell.proximity))
-			cell.entity.SetColor(termloop.ColorYellow, termloop.ColorBlue)
-		} else if cell.entity.Text() == sWave {
-			cell.entity.SetText(sBubble)
-		}
-	} else if cell.isFlagged {
-		cell.entity.SetText(sSpace)
-		cell.entity.SetColor(termloop.ColorMagenta, termloop.ColorMagenta)
-	} else {
-		char := sSpace
-		x, y := cell.entity.Position()
-		if (x%2 == 0 && y%2 == 0) || (x%2 != 0 && y%2 != 0) {
-			char = sWave
-		}
-		cell.entity.SetText(char)
-		cell.entity.SetColor(termloop.ColorWhite, termloop.ColorCyan)
-	}
-	cell.entity.Draw(screen)
-}
-
-func (cell *cell) Tick(event termloop.Event) {}
 
 func updateUI() {
 	screenW, screenH := game.Screen().Size()
@@ -111,15 +74,15 @@ func main() {
 	player = NewPlayer()
 
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
-	grid = make([][]cell, width)
+	grid = make([][]Cell, width)
 	for i := range grid {
-		grid[i] = make([]cell, height)
+		grid[i] = make([]Cell, height)
 	}
 
 	// Set up waves
 	for j := 0; j < height; j++ {
 		for i := 0; i < width; i++ {
-			grid[i][j] = cell{
+			grid[i][j] = Cell{
 				proximity: 0,
 				isMine:    false,
 				entity:    termloop.NewText(i, j, sSpace, termloop.ColorWhite, termloop.ColorCyan),
@@ -151,7 +114,7 @@ func main() {
 	updateUI()
 }
 
-func generateProximity(grid [][]cell) [][]cell {
+func generateProximity(grid [][]Cell) [][]Cell {
 	for x := range grid {
 		for y := range grid[x] {
 			if grid[x][y].isMine {
@@ -194,7 +157,7 @@ func generateProximity(grid [][]cell) [][]cell {
 	return grid
 }
 
-func generateMines(x int, y int, count int) [][]cell {
+func generateMines(x int, y int, count int) [][]Cell {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < count; i++ {
 		placeMine(x, y, grid)
@@ -203,7 +166,7 @@ func generateMines(x int, y int, count int) [][]cell {
 	return grid
 }
 
-func placeMine(x int, y int, grid [][]cell) [][]cell {
+func placeMine(x int, y int, grid [][]Cell) [][]Cell {
 	randX := rand.Intn(x)
 	randY := rand.Intn(y)
 
