@@ -73,7 +73,7 @@ func (cell *Cell) drawProximity() {
 }
 
 func (cell *Cell) drawFlag() {
-	cell.entity.SetText(sSpace)
+	cell.entity.SetText(" ")
 	cell.entity.SetColor(termloop.ColorMagenta, termloop.ColorMagenta)
 }
 

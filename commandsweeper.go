@@ -13,12 +13,6 @@ const width = 50
 const height = 20
 const mineCount = 100
 
-// "Graphics"
-const sMine = "✱"
-const sWave = "~"
-const sBubble = "·"
-const sSpace = " "
-
 var game *termloop.Game
 var level *termloop.BaseLevel
 var grid [][]Cell
@@ -95,7 +89,7 @@ func main() {
 		for j := range grid[i] {
 			if grid[i][j].render {
 				if grid[i][j].isMine {
-					level.AddEntity(termloop.NewText(i, j, sMine, termloop.ColorRed, termloop.ColorCyan))
+					level.AddEntity(termloop.NewText(i, j, "✱", termloop.ColorRed, termloop.ColorCyan))
 				}
 				if grid[i][j].proximity > 0 {
 					level.AddEntity(termloop.NewText(i, j, strconv.Itoa(grid[i][j].proximity), termloop.ColorBlack, termloop.ColorCyan))
