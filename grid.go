@@ -29,50 +29,39 @@ func (grid *Grid) placeRandomMine() {
 
 	grid.cells[x][y].isMine = true
 	grid.mines = append(grid.mines, coord{x, y})
+	grid.updateProximity(x, y)
 
 	return
 }
 
-func (grid *Grid) generateProximity() {
-	for _, mine := range grid.mines {
-		leftExtreme := (mine.x > 0)
-		rightExtreme := (mine.x+1 < grid.width)
-
-		topExtreme := (mine.y > 0)
-		bottomExtreme := (mine.y+1 < grid.height)
-
-		if leftExtreme {
-			grid.cells[mine.x-1][mine.y].proximity++
-
-			if topExtreme {
-				grid.cells[mine.x-1][mine.y-1].proximity++
-			}
-			if bottomExtreme {
-				grid.cells[mine.x-1][mine.y+1].proximity++
-			}
-		}
-
-		if rightExtreme {
-			grid.cells[mine.x+1][mine.y].proximity++
-			if topExtreme {
-				grid.cells[mine.x+1][mine.y-1].proximity++
-			}
-			if bottomExtreme {
-				grid.cells[mine.x+1][mine.y+1].proximity++
-			}
-		}
-
-		if topExtreme {
-			grid.cells[mine.x][mine.y-1].proximity++
-		}
-
-		if bottomExtreme {
-			grid.cells[mine.x][mine.y+1].proximity++
-		}
+func (grid *Grid) updateProximity(x int, y int) {
+	if x > 0 && y > 0 {
+		grid.cells[x-1][y-1].proximity++
+	}
+	if y > 0 {
+		grid.cells[x][y-1].proximity++
+	}
+	if x+1 < grid.width && y > 0 {
+		grid.cells[x+1][y-1].proximity++
+	}
+	if x > 0 {
+		grid.cells[x-1][y].proximity++
+	}
+	if x+1 < grid.width {
+		grid.cells[x+1][y].proximity++
+	}
+	if x > 0 && y+1 < grid.height {
+		grid.cells[x-1][y+1].proximity++
+	}
+	if y+1 < grid.height {
+		grid.cells[x][y+1].proximity++
+	}
+	if x+1 < grid.width && y+1 < grid.height {
+		grid.cells[x+1][y+1].proximity++
 	}
 }
 
-func NewGrid(width int, height int, mines int) Grid {
+func NewGrid(width int, height int, mineCount int) Grid {
 	// Create cells
 	grid := Grid{cells: make([][]Cell, width), width: width, height: height}
 	for x := 0; x < grid.width; x++ {
@@ -83,13 +72,10 @@ func NewGrid(width int, height int, mines int) Grid {
 	}
 
 	// Place mines
-	// grid.mines = make([]coord, mines)
 	rand.Seed(time.Now().Unix())
-	for i := 0; i < mines; i++ {
+	for i := 0; i < mineCount; i++ {
 		grid.placeRandomMine()
 	}
-
-	grid.generateProximity()
 
 	return grid
 }
