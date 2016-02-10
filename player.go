@@ -4,7 +4,8 @@ import "github.com/JoelOtter/termloop"
 
 //  Player state
 const (
-	Dead = 1 << iota
+	Alive = 1 << iota
+	Dead
 )
 
 type Player struct {
@@ -15,6 +16,7 @@ type Player struct {
 func NewPlayer() Player {
 	player = Player{
 		entity: termloop.NewEntity(width/2, height/2, 1, 1),
+		state:  Alive,
 	}
 	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: '⛴'})
 
