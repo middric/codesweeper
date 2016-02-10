@@ -53,12 +53,12 @@ func (player *Player) Draw(screen *termloop.Screen) {
 // Tick func
 func (player *Player) Tick(event termloop.Event) {
 	x, y := player.entity.Position()
-	if event.Ch == 102 && player.state != Dead && !grid[x][y].render {
-		if grid[x][y].isFlagged {
-			grid[x][y].isFlagged = false
+	if event.Ch == 102 && player.state != Dead && !grid.cells[x][y].render {
+		if grid.cells[x][y].isFlagged {
+			grid.cells[x][y].isFlagged = false
 			flags--
 		} else {
-			grid[x][y].isFlagged = true
+			grid.cells[x][y].isFlagged = true
 			flags++
 		}
 		UpdateUI()
@@ -78,7 +78,7 @@ func (player *Player) Tick(event termloop.Event) {
 			player.entity.SetPosition(x, y+1)
 			break
 		case termloop.KeySpace:
-			if grid[x][y].isMine {
+			if grid.cells[x][y].isMine {
 				ShowGameOver()
 				player.state = Dead
 			}

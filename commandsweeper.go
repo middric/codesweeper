@@ -1,9 +1,7 @@
 package main
 
 import (
-	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/JoelOtter/termloop"
 )
@@ -15,19 +13,19 @@ const mineCount = 100
 
 var game *termloop.Game
 var level *termloop.BaseLevel
-var grid [][]Cell
+var grid Grid
 var player Player
 var flags int
 
 func revealCells(x int, y int) {
 	if x >= 0 && y >= 0 && x < width && y < height {
-		if !grid[x][y].render && !grid[x][y].isMine {
-			grid[x][y].render = true
-			if grid[x][y].isFlagged {
-				grid[x][y].isFlagged = false
+		if !grid.cells[x][y].render && !grid.cells[x][y].isMine {
+			grid.cells[x][y].render = true
+			if grid.cells[x][y].isFlagged {
+				grid.cells[x][y].isFlagged = false
 				flags--
 			}
-			if grid[x][y].proximity < 1 {
+			if grid.cells[x][y].proximity < 1 {
 				revealCells(x-1, y-1)
 				revealCells(x-1, y)
 				revealCells(x+1, y+1)
@@ -43,35 +41,26 @@ func main() {
 	game = termloop.NewGame()
 	player = NewPlayer()
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
+	grid = NewGrid(width, height, mineCount)
 	game.SetDebugOn(true)
 
 	SetupUI()
 
-	grid = make([][]Cell, width)
-	for i := range grid {
-		grid[i] = make([]Cell, height)
-	}
-
 	// Set up waves
 	for j := 0; j < height; j++ {
 		for i := 0; i < width; i++ {
-			grid[i][j] = NewCell(i, j)
-			level.AddEntity(&grid[i][j])
+			level.AddEntity(&grid.cells[i][j])
 		}
 	}
 
-	// Place mines
-	grid = generateMines(width, height, mineCount)
-	grid = generateProximity(grid)
-
-	for i := range grid {
-		for j := range grid[i] {
-			if grid[i][j].render {
-				if grid[i][j].isMine {
+	for i := range grid.cells {
+		for j := range grid.cells[i] {
+			if grid.cells[i][j].render {
+				if grid.cells[i][j].isMine {
 					level.AddEntity(termloop.NewText(i, j, "✱", termloop.ColorRed, termloop.ColorCyan))
 				}
-				if grid[i][j].proximity > 0 {
-					level.AddEntity(termloop.NewText(i, j, strconv.Itoa(grid[i][j].proximity), termloop.ColorBlack, termloop.ColorCyan))
+				if grid.cells[i][j].proximity > 0 {
+					level.AddEntity(termloop.NewText(i, j, strconv.Itoa(grid.cells[i][j].proximity), termloop.ColorBlack, termloop.ColorCyan))
 				}
 			}
 		}
@@ -81,70 +70,4 @@ func main() {
 	game.Screen().SetLevel(level)
 	game.Start()
 	UpdateUI()
-}
-
-func generateProximity(grid [][]Cell) [][]Cell {
-	for x := range grid {
-		for y := range grid[x] {
-			if grid[x][y].isMine {
-				leftExtreme := (x-1 >= 0)
-				rightExtreme := (x+1 < len(grid))
-				topExtreme := (y-1 >= 0)
-				bottomExtreme := (y+1 < len(grid[x]))
-
-				if leftExtreme {
-					grid[x-1][y].proximity++
-
-					if topExtreme {
-						grid[x-1][y-1].proximity++
-					}
-					if bottomExtreme {
-						grid[x-1][y+1].proximity++
-					}
-				}
-
-				if rightExtreme {
-					grid[x+1][y].proximity++
-					if topExtreme {
-						grid[x+1][y-1].proximity++
-					}
-					if bottomExtreme {
-						grid[x+1][y+1].proximity++
-					}
-				}
-
-				if topExtreme {
-					grid[x][y-1].proximity++
-				}
-
-				if bottomExtreme {
-					grid[x][y+1].proximity++
-				}
-			}
-		}
-	}
-	return grid
-}
-
-func generateMines(x int, y int, count int) [][]Cell {
-	rand.Seed(time.Now().Unix())
-	for i := 0; i < count; i++ {
-		placeMine(x, y, grid)
-	}
-
-	return grid
-}
-
-func placeMine(x int, y int, grid [][]Cell) [][]Cell {
-	randX := rand.Intn(x)
-	randY := rand.Intn(y)
-
-	// If mine already in place try again
-	if grid[randX][randY].isMine {
-		return placeMine(x, y, grid)
-	}
-
-	grid[randX][randY].isMine = true
-
-	return grid
 }
