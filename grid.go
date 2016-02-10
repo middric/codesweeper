@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"math/rand"
 	"time"
 )
@@ -17,13 +18,13 @@ type Grid struct {
 	height int
 }
 
-func (grid *Grid) placeRandomMine() {
+func (grid *Grid) placeRandomMine(playerX int, playerY int) {
 	x := rand.Intn(grid.width)
 	y := rand.Intn(grid.height)
 
-	// If mine already in place try again
-	if grid.cells[x][y].isMine {
-		grid.placeRandomMine()
+	// If mine already in place OR its within 2 spaces of the player try again
+	if grid.cells[x][y].isMine || (math.Abs(float64(x-playerX)) <= 1 && math.Abs(float64(y-playerY)) <= 1) {
+		grid.placeRandomMine(playerX, playerY)
 		return
 	}
 
@@ -61,6 +62,14 @@ func (grid *Grid) updateProximity(x int, y int) {
 	}
 }
 
+func (grid *Grid) PlaceMines(x int, y int) {
+	// Place mines
+	rand.Seed(time.Now().Unix())
+	for i := 0; i < mineCount; i++ {
+		grid.placeRandomMine(x, y)
+	}
+}
+
 func NewGrid(width int, height int, mineCount int) Grid {
 	// Create cells
 	grid := Grid{cells: make([][]Cell, width), width: width, height: height}
@@ -69,12 +78,6 @@ func NewGrid(width int, height int, mineCount int) Grid {
 		for y := 0; y < grid.height; y++ {
 			grid.cells[x][y] = NewCell(x, y)
 		}
-	}
-
-	// Place mines
-	rand.Seed(time.Now().Unix())
-	for i := 0; i < mineCount; i++ {
-		grid.placeRandomMine()
 	}
 
 	return grid

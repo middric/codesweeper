@@ -53,6 +53,8 @@ func (player *Player) Draw(screen *termloop.Screen) {
 // Tick func
 func (player *Player) Tick(event termloop.Event) {
 	x, y := player.entity.Position()
+
+	// F key
 	if event.Ch == 102 && player.state != Dead && !grid.cells[x][y].render {
 		if grid.cells[x][y].isFlagged {
 			grid.cells[x][y].isFlagged = false
@@ -78,6 +80,9 @@ func (player *Player) Tick(event termloop.Event) {
 			player.entity.SetPosition(x, y+1)
 			break
 		case termloop.KeySpace:
+			if len(grid.mines) == 0 {
+				grid.PlaceMines(player.entity.Position())
+			}
 			if grid.cells[x][y].isMine {
 				ShowGameOver()
 				player.state = Dead
