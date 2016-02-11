@@ -18,7 +18,8 @@ func NewPlayer() Player {
 		entity: termloop.NewEntity(width/2, height/2, 1, 1),
 		state:  Alive,
 	}
-	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: '⛴'})
+	// player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: '⛴'})
+	player.entity.SetCell(0, 0, &termloop.Cell{Fg: termloop.ColorBlack, Ch: 'o'})
 
 	return player
 }

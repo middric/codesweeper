@@ -73,10 +73,12 @@ func (grid Grid) RevealCells(x int, y int) {
 			if grid.cells[x][y].proximity < 1 {
 				grid.RevealCells(x-1, y-1)
 				grid.RevealCells(x-1, y)
-				grid.RevealCells(x+1, y+1)
-				grid.RevealCells(x+1, y)
+				grid.RevealCells(x-1, y+1)
 				grid.RevealCells(x, y-1)
 				grid.RevealCells(x, y+1)
+				grid.RevealCells(x+1, y-1)
+				grid.RevealCells(x+1, y)
+				grid.RevealCells(x+1, y+1)
 			}
 		}
 	}
