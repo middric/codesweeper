@@ -14,7 +14,6 @@ const mineCount = 100
 var game *termloop.Game
 var level *termloop.BaseLevel
 var grid Grid
-var player Player
 var flags int
 
 func revealCells(x int, y int) {
@@ -39,7 +38,7 @@ func revealCells(x int, y int) {
 
 func main() {
 	game = termloop.NewGame()
-	player = NewPlayer()
+	player := NewPlayer()
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
 	grid = NewGrid(width, height, mineCount)
 	game.SetDebugOn(true)

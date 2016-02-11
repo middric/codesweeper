@@ -14,7 +14,7 @@ type Player struct {
 }
 
 func NewPlayer() Player {
-	player = Player{
+	player := Player{
 		entity: termloop.NewEntity(width/2, height/2, 1, 1),
 		state:  Alive,
 	}
