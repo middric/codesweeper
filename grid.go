@@ -62,6 +62,26 @@ func (grid *Grid) updateProximity(x int, y int) {
 	}
 }
 
+func (grid Grid) RevealCells(x int, y int) {
+	if x >= 0 && y >= 0 && x < width && y < height {
+		if !grid.cells[x][y].isRevealed && !grid.cells[x][y].isMine {
+			grid.cells[x][y].isRevealed = true
+			if grid.cells[x][y].isFlagged {
+				grid.cells[x][y].isFlagged = false
+				flags--
+			}
+			if grid.cells[x][y].proximity < 1 {
+				grid.RevealCells(x-1, y-1)
+				grid.RevealCells(x-1, y)
+				grid.RevealCells(x+1, y+1)
+				grid.RevealCells(x+1, y)
+				grid.RevealCells(x, y-1)
+				grid.RevealCells(x, y+1)
+			}
+		}
+	}
+}
+
 func (grid *Grid) PlaceMines(x int, y int) {
 	// Place mines
 	rand.Seed(time.Now().Unix())

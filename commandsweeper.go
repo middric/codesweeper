@@ -16,26 +16,6 @@ var level *termloop.BaseLevel
 var grid Grid
 var flags int
 
-func revealCells(x int, y int) {
-	if x >= 0 && y >= 0 && x < width && y < height {
-		if !grid.cells[x][y].isRevealed && !grid.cells[x][y].isMine {
-			grid.cells[x][y].isRevealed = true
-			if grid.cells[x][y].isFlagged {
-				grid.cells[x][y].isFlagged = false
-				flags--
-			}
-			if grid.cells[x][y].proximity < 1 {
-				revealCells(x-1, y-1)
-				revealCells(x-1, y)
-				revealCells(x+1, y+1)
-				revealCells(x+1, y)
-				revealCells(x, y-1)
-				revealCells(x, y+1)
-			}
-		}
-	}
-}
-
 func main() {
 	game = termloop.NewGame()
 	player := NewPlayer()

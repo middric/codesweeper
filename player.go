@@ -87,7 +87,7 @@ func (player *Player) Tick(event termloop.Event) {
 				ShowGameOver()
 				player.state = Dead
 			}
-			revealCells(x, y)
+			grid.RevealCells(x, y)
 			UpdateUI()
 		}
 	}
