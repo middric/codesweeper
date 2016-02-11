@@ -55,7 +55,7 @@ func (player *Player) Tick(event termloop.Event) {
 	x, y := player.entity.Position()
 
 	// F key
-	if event.Ch == 102 && player.state != Dead && !grid.cells[x][y].render {
+	if event.Ch == 102 && player.state != Dead && !grid.cells[x][y].isRevealed {
 		if grid.cells[x][y].isFlagged {
 			grid.cells[x][y].isFlagged = false
 			flags--

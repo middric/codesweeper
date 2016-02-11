@@ -8,24 +8,24 @@ import (
 
 // Cell defines the properties for a cell in the minefield
 type Cell struct {
-	entity    *termloop.Text
-	isFlagged bool
-	isMine    bool
-	isWave    bool
-	proximity int
-	render    bool
+	entity     *termloop.Text
+	isFlagged  bool
+	isMine     bool
+	isRevealed bool
+	isWave     bool
+	proximity  int
 }
 
 // NewCell creates a new cell. Accepts x and y coordinate parameters to
 // determine "isWave" state. Returns a new instance of Cell.
 func NewCell(x int, y int) Cell {
 	cell := Cell{
-		entity:    termloop.NewText(x, y, " ", termloop.ColorWhite, termloop.ColorCyan),
-		isFlagged: false,
-		isMine:    false,
-		isWave:    (x%2 == 0 && y%2 == 0) || (x%2 != 0 && y%2 != 0),
-		proximity: 0,
-		render:    false,
+		entity:     termloop.NewText(x, y, " ", termloop.ColorWhite, termloop.ColorCyan),
+		isFlagged:  false,
+		isMine:     false,
+		isWave:     (x%2 == 0 && y%2 == 0) || (x%2 != 0 && y%2 != 0),
+		proximity:  0,
+		isRevealed: false,
 	}
 
 	return cell
@@ -33,9 +33,9 @@ func NewCell(x int, y int) Cell {
 
 // Draw a cell
 func (cell *Cell) Draw(screen *termloop.Screen) {
-	if cell.render && cell.isMine {
+	if cell.isRevealed && cell.isMine {
 		cell.drawMine()
-	} else if cell.render {
+	} else if cell.isRevealed {
 		cell.drawRevealed()
 	} else if cell.isFlagged {
 		cell.drawFlag()
@@ -73,8 +73,8 @@ func (cell *Cell) drawProximity() {
 }
 
 func (cell *Cell) drawFlag() {
-	cell.entity.SetText(" ")
-	cell.entity.SetColor(termloop.ColorMagenta, termloop.ColorMagenta)
+	cell.entity.SetText("✖")
+	cell.entity.SetColor(termloop.ColorRed, termloop.ColorWhite)
 }
 
 func (cell *Cell) drawHidden() {

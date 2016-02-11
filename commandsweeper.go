@@ -19,8 +19,8 @@ var flags int
 
 func revealCells(x int, y int) {
 	if x >= 0 && y >= 0 && x < width && y < height {
-		if !grid.cells[x][y].render && !grid.cells[x][y].isMine {
-			grid.cells[x][y].render = true
+		if !grid.cells[x][y].isRevealed && !grid.cells[x][y].isMine {
+			grid.cells[x][y].isRevealed = true
 			if grid.cells[x][y].isFlagged {
 				grid.cells[x][y].isFlagged = false
 				flags--
@@ -55,7 +55,7 @@ func main() {
 
 	for i := range grid.cells {
 		for j := range grid.cells[i] {
-			if grid.cells[i][j].render {
+			if grid.cells[i][j].isRevealed {
 				if grid.cells[i][j].isMine {
 					level.AddEntity(termloop.NewText(i, j, "✱", termloop.ColorRed, termloop.ColorCyan))
 				}
