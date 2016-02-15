@@ -5,13 +5,13 @@ import "github.com/JoelOtter/termloop"
 // Play area config
 const width = 50
 const height = 20
-const mineCount = 100
 
 var game *termloop.Game
 var level *termloop.BaseLevel
 var player Player
 var grid Grid
 var flags int
+var mineCount = 100
 
 func main() {
 	game = termloop.NewGame()

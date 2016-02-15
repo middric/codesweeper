@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/JoelOtter/termloop"
@@ -73,11 +74,17 @@ func (d *Dialog) Close() {
 }
 
 func (d *Dialog) Tick(ev termloop.Event) {
-	switch ev.Key {
-	case termloop.KeyEnter:
-	case termloop.KeyEsc:
+	// Key presses between 0-9
+	if ev.Ch >= 48 && ev.Ch <= 57 {
+		mineCount, _ = strconv.Atoi(string(ev.Ch))
 		d.Close()
-		break
+	} else if ev.Type == termloop.EventKey {
+		switch ev.Key {
+		case termloop.KeyEnter:
+		case termloop.KeyEsc:
+			d.Close()
+			break
+		}
 	}
 }
 
