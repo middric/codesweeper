@@ -35,41 +35,35 @@ func (grid *Grid) placeRandomMine(playerX int, playerY int) {
 	return
 }
 
-func (grid *Grid) updateProximity(x int, y int) {
-	if x > 0 && y > 0 {
-		grid.cells[x-1][y-1].proximity++
-	}
-	if y > 0 {
-		grid.cells[x][y-1].proximity++
-	}
-	if x+1 < grid.width && y > 0 {
-		grid.cells[x+1][y-1].proximity++
-	}
-	if x > 0 {
-		grid.cells[x-1][y].proximity++
-	}
-	if x+1 < grid.width {
-		grid.cells[x+1][y].proximity++
-	}
-	if x > 0 && y+1 < grid.height {
-		grid.cells[x-1][y+1].proximity++
-	}
-	if y+1 < grid.height {
-		grid.cells[x][y+1].proximity++
-	}
-	if x+1 < grid.width && y+1 < grid.height {
-		grid.cells[x+1][y+1].proximity++
+func increaseCellProximity(x int, y int) {
+	if x >= 0 && x < grid.width && y >= 0 && y < grid.height {
+		grid.cells[x][y].proximity++
 	}
 }
 
+func (grid *Grid) updateProximity(x int, y int) {
+	increaseCellProximity(x-1, y-1)
+	increaseCellProximity(x-1, y)
+	increaseCellProximity(x-1, y+1)
+	increaseCellProximity(x, y-1)
+	increaseCellProximity(x, y+1)
+	increaseCellProximity(x+1, y-1)
+	increaseCellProximity(x+1, y)
+	increaseCellProximity(x+1, y+1)
+}
+
 func (grid Grid) RevealCells(x int, y int) {
+	// Ensure cell is in bounds
 	if x >= 0 && y >= 0 && x < width && y < height {
-		if !grid.cells[x][y].isRevealed && !grid.cells[x][y].isMine {
+		// If it hasnt already been revealed
+		if !grid.cells[x][y].isRevealed {
 			grid.cells[x][y].isRevealed = true
+			// Reset any flagged cells we reveal
 			if grid.cells[x][y].isFlagged {
 				grid.cells[x][y].isFlagged = false
 				flags--
 			}
+			// Reveal surrounding cells
 			if grid.cells[x][y].proximity < 1 {
 				grid.RevealCells(x-1, y-1)
 				grid.RevealCells(x-1, y)
