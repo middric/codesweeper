@@ -17,15 +17,8 @@ func UpdateUI() {
 
 func ShowGameOver() {
 	msg := []string{
-		"                     ",
-		"      Game Over!     ",
-		"                     ",
+		"Game Over!",
 	}
-	length := len(msg[0])
-	left := (width / 2) - (length / 2)
-	top := (height / 2) - 2
 
-	for i, line := range msg {
-		level.AddEntity(termloop.NewText(left, top+i, line, termloop.ColorBlack, termloop.ColorRed))
-	}
+	level.AddEntity(NewDialog(5, 1, msg, termloop.ColorBlack, termloop.ColorRed))
 }
