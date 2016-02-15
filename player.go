@@ -45,10 +45,10 @@ func (player *Player) Draw(screen *termloop.Screen) {
 
 		// Draw player
 		player.entity.Draw(screen)
-
-		screenWidth, screenHeight := screen.Size()
-		level.SetOffset((screenWidth-width)/2, (screenHeight-height)/2)
 	}
+
+	screenWidth, screenHeight := screen.Size()
+	level.SetOffset((screenWidth-width)/2, (screenHeight-height)/2)
 }
 
 // Tick func
