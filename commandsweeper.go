@@ -1,10 +1,6 @@
 package main
 
-import (
-	"strconv"
-
-	"github.com/JoelOtter/termloop"
-)
+import "github.com/JoelOtter/termloop"
 
 // Play area config
 const width = 50
@@ -25,27 +21,16 @@ func main() {
 
 	SetupUI()
 
-	// Set up waves
-	for j := 0; j < height; j++ {
-		for i := 0; i < width; i++ {
-			level.AddEntity(&grid.cells[i][j])
+	// Add cells to level
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			level.AddEntity(&grid.cells[x][y])
 		}
 	}
 
-	for i := range grid.cells {
-		for j := range grid.cells[i] {
-			if grid.cells[i][j].isRevealed {
-				if grid.cells[i][j].isMine {
-					level.AddEntity(termloop.NewText(i, j, "✱", termloop.ColorRed, termloop.ColorCyan))
-				}
-				if grid.cells[i][j].proximity > 0 {
-					level.AddEntity(termloop.NewText(i, j, strconv.Itoa(grid.cells[i][j].proximity), termloop.ColorBlack, termloop.ColorCyan))
-				}
-			}
-		}
-	}
-
+	// Add player to level
 	level.AddEntity(&player)
+
 	game.Screen().SetLevel(level)
 	game.Start()
 	UpdateUI()
