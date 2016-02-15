@@ -9,12 +9,13 @@ const mineCount = 100
 
 var game *termloop.Game
 var level *termloop.BaseLevel
+var player Player
 var grid Grid
 var flags int
 
 func main() {
 	game = termloop.NewGame()
-	player := NewPlayer()
+	player = NewPlayer()
 	level = termloop.NewBaseLevel(termloop.Cell{Bg: termloop.ColorBlack})
 	grid = NewGrid(width, height, mineCount)
 	game.SetDebugOn(true)
@@ -32,6 +33,7 @@ func main() {
 	level.AddEntity(&player)
 
 	game.Screen().SetLevel(level)
-	game.Start()
 	UpdateUI()
+	GameSetup()
+	game.Start()
 }

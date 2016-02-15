@@ -22,3 +22,12 @@ func ShowGameOver() {
 
 	level.AddEntity(NewDialog(5, 1, msg, termloop.ColorBlack, termloop.ColorRed))
 }
+
+func GameSetup() {
+	msg := []string{
+		"Number of mines: " + strconv.Itoa(mineCount),
+	}
+
+	level.AddEntity(NewDialog(1, 1, msg, termloop.ColorBlack, termloop.ColorGreen))
+	player.state = Dead
+}

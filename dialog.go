@@ -15,7 +15,7 @@ type Dialog struct {
 	canvas [][]termloop.Cell
 }
 
-func longest(text []string) int {
+func maximumLength(text []string) int {
 	length := 0
 
 	for i := range text {
@@ -30,7 +30,7 @@ func longest(text []string) int {
 func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dialog {
 
 	// Find out text dimensions (adding padding)
-	dialogWidth := longest(text) + (paddingX * 2)
+	dialogWidth := maximumLength(text) + (paddingX * 2)
 	dialogHeight := len(text) + (paddingY * 2)
 
 	// Pad dialog with a blank line before and after
@@ -67,7 +67,18 @@ func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dia
 	}
 }
 
-func (d *Dialog) Tick(ev termloop.Event) {}
+func (d *Dialog) Close() {
+	level.RemoveEntity(d)
+	player.state = Alive
+}
+
+func (d *Dialog) Tick(ev termloop.Event) {
+	switch ev.Key {
+	case termloop.KeyEnter:
+		d.Close()
+		break
+	}
+}
 
 // Draw draws the Dialog to the Screen s.
 func (d *Dialog) Draw(s *termloop.Screen) {
