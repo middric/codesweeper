@@ -25,7 +25,9 @@ func ShowGameOver() {
 
 func GameSetup() {
 	msg := []string{
-		"Number of mines: " + strconv.Itoa(mineCount),
+		"Number of mines:",
+		"",
+		"{{mineCount," + strconv.Itoa(mineCount) + "}}",
 	}
 
 	level.AddEntity(NewDialog(1, 1, msg, termloop.ColorBlack, termloop.ColorGreen))

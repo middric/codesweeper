@@ -8,12 +8,13 @@ import (
 )
 
 type Dialog struct {
-	x      int
-	y      int
-	fg     termloop.Attr
-	bg     termloop.Attr
-	text   []string
-	canvas [][]termloop.Cell
+	x        int
+	y        int
+	fg       termloop.Attr
+	bg       termloop.Attr
+	text     []string
+	original []string
+	canvas   [][]termloop.Cell
 }
 
 func maximumLength(text []string) int {
@@ -28,43 +29,91 @@ func maximumLength(text []string) int {
 	return length
 }
 
-func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dialog {
-
-	// Find out text dimensions (adding padding)
+func DialogDimensions(text []string, paddingX int, paddingY int) (int, int) {
 	dialogWidth := maximumLength(text) + (paddingX * 2)
 	dialogHeight := len(text) + (paddingY * 2)
 
-	// Pad dialog with a blank line before and after
+	return dialogWidth, dialogHeight
+}
+
+func PadText(text []string, paddingX, paddingY int) []string {
 	text = append(text, make([]string, paddingY)...)
 	text = append(make([]string, paddingY), text...)
+	for i := range text {
+		// Pad line
+		text[i] = strings.Repeat(" ", paddingX) + text[i] + strings.Repeat(" ", paddingX)
+	}
+	return text
+}
+
+func CenterDialog(dialogWidth, dialogHeight int) (int, int) {
+	x := (width - dialogWidth) / 2
+	y := (height - dialogHeight) / 2
+	return x, y
+}
+
+func IsInputField(text string) bool {
+	trimmed := strings.TrimSpace(text)
+	prefix := strings.HasPrefix(trimmed, "{{")
+	suffix := strings.HasSuffix(trimmed, "}}")
+
+	return prefix && suffix
+}
+
+func inputKeyValue(input string) (string, string) {
+	input = strings.TrimSpace(input)
+	input = strings.TrimPrefix(input, "{{")
+	input = strings.TrimSuffix(input, "}}")
+
+	components := strings.Split(input, ",")
+
+	return strings.TrimSpace(components[0]), strings.TrimSpace(components[1])
+}
+
+func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dialog {
+	original := text
+	// Find out text dimensions (adding padding)
+	dialogWidth, dialogHeight := DialogDimensions(text, paddingX, paddingY)
+
+	// Pad text
+	text = PadText(text, paddingX, paddingY)
+
+	// Center the dialog
+	x, y := CenterDialog(dialogWidth, dialogHeight)
 
 	canvas := make([][]termloop.Cell, dialogHeight)
-	for i, line := range text {
-		// Pad line
-		str := []rune(strings.Repeat(" ", paddingX) + line + strings.Repeat(" ", paddingX))
-
+	for i := range text {
 		canvas[i] = make([]termloop.Cell, dialogWidth)
+		if IsInputField(text[i]) {
+			_, value := inputKeyValue(text[i])
 
-		for j := range canvas[i] {
-			ch := ' '
-			if j < len(str) {
-				ch = str[j]
+			canvas[i][0] = termloop.Cell{Ch: ' ', Fg: fg, Bg: bg}
+			for j := 1; j < dialogWidth-1; j++ {
+				canvas[i][j] = termloop.Cell{Ch: '_', Fg: fg, Bg: bg}
 			}
-			canvas[i][j] = termloop.Cell{Ch: ch, Fg: fg, Bg: bg}
+
+			for j := 0; j < len(value); j++ {
+				canvas[i][len(canvas[i])-2-j].Ch = rune(value[len(value)-1-j])
+			}
+			canvas[i][dialogWidth-1] = termloop.Cell{Ch: ' ', Fg: fg, Bg: bg}
+		} else {
+			for j := range canvas[i] {
+				canvas[i][j] = termloop.Cell{Ch: ' ', Fg: fg, Bg: bg}
+				if j < len(text[i]) {
+					canvas[i][j].Ch = rune(text[i][j])
+				}
+			}
 		}
 	}
 
-	// Center the dialog
-	x := (width - dialogWidth) / 2
-	y := (height - dialogHeight) / 2
-
 	return &Dialog{
-		x:      x,
-		y:      y,
-		fg:     fg,
-		bg:     bg,
-		text:   text,
-		canvas: canvas,
+		x:        x,
+		y:        y,
+		fg:       fg,
+		bg:       bg,
+		text:     text,
+		canvas:   canvas,
+		original: original,
 	}
 }
 
@@ -77,7 +126,6 @@ func (d *Dialog) Tick(ev termloop.Event) {
 	// Key presses between 0-9
 	if ev.Ch >= 48 && ev.Ch <= 57 {
 		mineCount, _ = strconv.Atoi(string(ev.Ch))
-		d.Close()
 	} else if ev.Type == termloop.EventKey {
 		switch ev.Key {
 		case termloop.KeyEnter:
