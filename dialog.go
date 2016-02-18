@@ -17,6 +17,7 @@ type Dialog struct {
 	canvas   [][]termloop.Cell
 }
 
+// Determine length of longest string in a slice of strings
 func maximumLength(text []string) int {
 	length := 0
 
@@ -29,6 +30,8 @@ func maximumLength(text []string) int {
 	return length
 }
 
+// DialogDimensions takes a slice of strings and an amount of padding and
+// determines the correct width and height for a dialog box
 func DialogDimensions(text []string, paddingX int, paddingY int) (int, int) {
 	dialogWidth := maximumLength(text) + (paddingX * 2)
 	dialogHeight := len(text) + (paddingY * 2)
@@ -36,6 +39,8 @@ func DialogDimensions(text []string, paddingX int, paddingY int) (int, int) {
 	return dialogWidth, dialogHeight
 }
 
+// PadText iterates through a slice of strings and adds the appropriate top and
+// side padding
 func PadText(text []string, paddingX, paddingY int) []string {
 	text = append(text, make([]string, paddingY)...)
 	text = append(make([]string, paddingY), text...)
@@ -46,13 +51,15 @@ func PadText(text []string, paddingX, paddingY int) []string {
 	return text
 }
 
+// CenterDialog takes a dialog width and height and return the x and y
+// coordinates to use when centering the dialog
 func CenterDialog(dialogWidth, dialogHeight int) (int, int) {
 	x := (width - dialogWidth) / 2
 	y := (height - dialogHeight) / 2
 	return x, y
 }
 
-func IsInputField(text string) bool {
+func isInputField(text string) bool {
 	trimmed := strings.TrimSpace(text)
 	prefix := strings.HasPrefix(trimmed, "{{")
 	suffix := strings.HasSuffix(trimmed, "}}")
@@ -70,6 +77,7 @@ func inputKeyValue(input string) (string, string) {
 	return strings.TrimSpace(components[0]), strings.TrimSpace(components[1])
 }
 
+// NewDialog creates a new Dialog object
 func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dialog {
 	original := text
 	// Find out text dimensions (adding padding)
@@ -84,14 +92,12 @@ func NewDialog(paddingX, paddingY int, text []string, fg, bg termloop.Attr) *Dia
 	canvas := make([][]termloop.Cell, dialogHeight)
 	for i := range text {
 		canvas[i] = make([]termloop.Cell, dialogWidth)
-		if IsInputField(text[i]) {
-			_, value := inputKeyValue(text[i])
-
+		if isInputField(text[i]) {
 			canvas[i][0] = termloop.Cell{Ch: ' ', Fg: fg, Bg: bg}
 			for j := 1; j < dialogWidth-1; j++ {
 				canvas[i][j] = termloop.Cell{Ch: '_', Fg: fg, Bg: bg}
 			}
-
+			_, value := inputKeyValue(text[i])
 			for j := 0; j < len(value); j++ {
 				canvas[i][len(canvas[i])-2-j].Ch = rune(value[len(value)-1-j])
 			}
